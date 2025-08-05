@@ -30,6 +30,18 @@ const WebPlayback: FC<WebPlaybackProps> = memo((props) => {
   const deviceSelectedInterval = useRef<NodeJS.Timeout | null>(null);
   const trackTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const currentTrackIdRef = useRef<string | null>(null);
+  const extendedTimeoutTracksRef = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    fetch('/extendedTimeoutTracks.json')
+      .then((res) => res.json())
+      .then((tracks: string[]) => {
+        extendedTimeoutTracksRef.current = new Set(tracks);
+      })
+      .catch((err) => {
+        console.error('Failed to load extended timeout tracks', err);
+      });
+  }, []);
 
   const handleState = async (state: any | null) => {
     if (state) {
@@ -42,15 +54,23 @@ const WebPlayback: FC<WebPlaybackProps> = memo((props) => {
         }
       } else {
         const newTrackId = state.track_window?.current_track?.id;
+        const trackName = state.track_window?.current_track?.name;
 
-        if (newTrackId && currentTrackIdRef.current !== newTrackId) {
+        if (
+          newTrackId &&
+          (currentTrackIdRef.current !== newTrackId || !trackTimeoutRef.current)
+        ) {
           if (trackTimeoutRef.current) {
             clearTimeout(trackTimeoutRef.current);
           }
 
-          trackTimeoutRef.current = setTimeout(() => {
-            playerService.nextTrack();
-          }, 30000);
+          if (extendedTimeoutTracksRef.current.has(trackName)) {
+            trackTimeoutRef.current = setTimeout(() => {
+              playerService.nextTrack();
+            }, 50000);
+          } else {
+            trackTimeoutRef.current = null;
+          }
 
           currentTrackIdRef.current = newTrackId;
         }
