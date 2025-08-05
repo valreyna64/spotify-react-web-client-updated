@@ -129,23 +129,42 @@ export const getNextTracks = createAsyncThunk<PlaylistItemWithSaved[]>(
   async (_params, { getState }) => {
     const { playlist, tracks } = (getState() as RootState).playlist;
 
-    const { data } = await playlistService.getPlaylistItems(playlist!.id, {
-      offset: tracks.length,
-      limit: 50,
-    });
+    if (!playlist) {
+      return [];
+    }
 
-    const ids = data.items.map((item) => item.track.id);
+    const total = playlist.tracks?.total ?? 0;
+    let offset = tracks.length;
+    const limit = 100;
+    const collected: PlaylistItemWithSaved[] = [];
 
-    const { data: saved } = await (ids.length
-      ? userService.checkSavedTracks(ids).catch(() => ({ data: [] }))
-      : Promise.resolve({ data: [] }));
+    while (offset < total) {
+      const { data } = await playlistService.getPlaylistItems(playlist.id, {
+        offset,
+        limit,
+      });
 
-    const itemsWithSave: PlaylistItemWithSaved[] = data.items.map((item, index) => ({
-      ...item,
-      saved: saved[index],
-    }));
+      const ids = data.items.map((item) => item.track.id);
 
-    return itemsWithSave;
+      const { data: saved } = await (ids.length
+        ? userService.checkSavedTracks(ids).catch(() => ({ data: [] }))
+        : Promise.resolve({ data: [] }));
+
+      collected.push(
+        ...data.items.map((item, index) => ({
+          ...item,
+          saved: saved[index],
+        }))
+      );
+
+      offset += data.items.length;
+
+      if (data.items.length < limit) {
+        break;
+      }
+    }
+
+    return collected;
   }
 );
 

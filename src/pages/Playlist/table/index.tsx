@@ -1,5 +1,5 @@
 // Components
-import { Divider } from 'antd';
+import { Divider, Button } from 'antd';
 import SongView from './Song';
 import { PlaylistTableHeader } from './header';
 import { PlaylistControls } from '../controls';
@@ -95,6 +95,14 @@ export const PlaylistList: FC<PlaylistListProps> = memo(({ color }) => {
           </div>
         ) : null}
       </InfiniteScroll>
+
+      {tracks.length < playlist?.tracks?.total! && (
+        <div style={{ textAlign: 'center', padding: '10px 0' }}>
+          <Button onClick={() => dispatch(playlistActions.getNextTracks())}>
+            Load more
+          </Button>
+        </div>
+      )}
 
       <PlaylistRecommendations />
     </div>
