@@ -141,7 +141,7 @@ export const getRefreshToken = async () => {
   const refreshToken = localStorage.getItem('refresh_token') as string;
 
   if (!refreshToken) {
-    logInWithSpotify(true);
+    logInWithSpotify();
     return null;
   }
 
@@ -162,14 +162,14 @@ export const getRefreshToken = async () => {
   const response = await body.json();
 
   if (!response.access_token) {
-    logInWithSpotify(true);
+    logInWithSpotify();
     return null;
   }
 
   setLocalStorageWithExpiry('access_token', response.access_token, response.expires_in * 60 * 60);
   axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.access_token;
-  if (response.refreshToken) {
-    localStorage.setItem('refresh_token', response.refreshToken);
+  if (response.refresh_token) {
+    localStorage.setItem('refresh_token', response.refresh_token);
   }
   return response.access_token;
 };
