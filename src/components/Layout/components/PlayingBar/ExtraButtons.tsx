@@ -1,19 +1,13 @@
 // Components
 import { Col, Row } from 'antd';
 import VolumeControls from './Volume';
+import DeviceButton from './DeviceButton';
 import { Tooltip } from '../../../Tooltip';
 import { FullScreenPlayer } from '../../../FullScreen';
 import { FullScreen, useFullScreenHandle } from 'react-full-screen';
 
 // Icons
-import {
-  DetailsIcon,
-  DeviceIcon,
-  ExpandIcon,
-  ListIcon,
-  MicrophoneIcon,
-  PhoneIcon,
-} from '../../../Icons';
+import { DetailsIcon, ExpandIcon, ListIcon, MicrophoneIcon } from '../../../Icons';
 
 // I18n
 import { useTranslation } from 'react-i18next';
@@ -113,29 +107,6 @@ const ExpandButton = () => {
   );
 };
 
-const DeviceButton = () => {
-  const dispatch = useAppDispatch();
-  const { t } = useTranslation(['playingBar']);
-  const isDeviceOpen = useAppSelector((state) => !state.ui.devicesCollapsed);
-
-  const currentDevice = useAppSelector((state) => state.spotify.activeDeviceType);
-
-  return (
-    <Tooltip title={t('Connect to a device')}>
-      <button
-        onClick={() => dispatch(uiActions.toggleDevices())}
-        className={isDeviceOpen ? 'active-icon-button' : ''}
-        style={{ marginTop: 4, cursor: isDeviceOpen ? 'pointer' : 'not-allowed' }}
-      >
-        {currentDevice === 'Smartphone' ? (
-          <PhoneIcon active={isDeviceOpen} />
-        ) : (
-          <DeviceIcon active={isDeviceOpen} />
-        )}
-      </button>
-    </Tooltip>
-  );
-};
 
 const ExtraControlButtons = () => {
   return (
