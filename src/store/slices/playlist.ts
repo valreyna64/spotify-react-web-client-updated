@@ -129,13 +129,17 @@ export const getNextTracks = createAsyncThunk<PlaylistItemWithSaved[]>(
   async (_params, { getState }) => {
     const { playlist, tracks } = (getState() as RootState).playlist;
 
-    const total = playlist!.tracks.total;
+    if (!playlist) {
+      return [];
+    }
+
+    const total = playlist.tracks?.total ?? 0;
     let offset = tracks.length;
     const limit = 100;
     const collected: PlaylistItemWithSaved[] = [];
 
     while (offset < total) {
-      const { data } = await playlistService.getPlaylistItems(playlist!.id, {
+      const { data } = await playlistService.getPlaylistItems(playlist.id, {
         offset,
         limit,
       });
