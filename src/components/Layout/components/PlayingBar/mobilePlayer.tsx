@@ -2,6 +2,7 @@ import SongDetails from './SongDetails';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 import { Col, Row } from 'antd';
 import { ListIcon, Pause, Play } from '../../../Icons';
+import DeviceButton from './DeviceButton';
 
 // Redux
 import { playerService } from '../../../../services/player';
@@ -67,29 +68,30 @@ const NowPlayingBarMobile = () => {
           <Col>
             <SongDetails isMobile />
           </Col>
-          <Col style={{ display: 'flex' }}>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                minWidth: 50,
-                marginRight: 5,
-                gap: 15,
-                justifyContent: 'space-between',
-              }}
-            >
-              <QueueButton />
-              <AddSongToLibraryButton
-                size={17}
-                isSaved={liked}
-                id={currentSong?.id!}
-                onToggle={() => {
-                  dispatch(spotifyActions.setLiked({ liked: !liked }));
+            <Col style={{ display: 'flex' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  minWidth: 50,
+                  marginRight: 5,
+                  gap: 15,
+                  justifyContent: 'space-between',
                 }}
-              />
-              <PlayButton />
-            </div>
-          </Col>
+              >
+                <DeviceButton />
+                <QueueButton />
+                <AddSongToLibraryButton
+                  size={17}
+                  isSaved={liked}
+                  id={currentSong?.id!}
+                  onToggle={() => {
+                    dispatch(spotifyActions.setLiked({ liked: !liked }));
+                  }}
+                />
+                <PlayButton />
+              </div>
+            </Col>
         </Row>
         <div className='time-line'>
           <div
