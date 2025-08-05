@@ -28,10 +28,33 @@ const WebPlayback: FC<WebPlaybackProps> = memo((props) => {
   const webPlaybackInstance = useRef<Spotify.Player | null>(null);
   const statePollingInterval = useRef<NodeJS.Timeout | null>(null);
   const deviceSelectedInterval = useRef<NodeJS.Timeout | null>(null);
+  const trackTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const currentTrackIdRef = useRef<string | null>(null);
 
   const handleState = async (state: any | null) => {
     if (state) {
       dispatch(spotifyActions.setState({ state }));
+
+      if (state.paused) {
+        if (trackTimeoutRef.current) {
+          clearTimeout(trackTimeoutRef.current);
+          trackTimeoutRef.current = null;
+        }
+      } else {
+        const newTrackId = state.track_window?.current_track?.id;
+
+        if (newTrackId && currentTrackIdRef.current !== newTrackId) {
+          if (trackTimeoutRef.current) {
+            clearTimeout(trackTimeoutRef.current);
+          }
+
+          trackTimeoutRef.current = setTimeout(() => {
+            playerService.nextTrack();
+          }, 30000);
+
+          currentTrackIdRef.current = newTrackId;
+        }
+      }
     } else {
       clearStatePolling();
       await waitForDeviceToBeSelected();
@@ -159,6 +182,7 @@ const WebPlayback: FC<WebPlaybackProps> = memo((props) => {
     return () => {
       clearStatePolling();
       if (deviceSelectedInterval.current) clearInterval(deviceSelectedInterval.current);
+      if (trackTimeoutRef.current) clearTimeout(trackTimeoutRef.current);
       webPlaybackInstance.current?.disconnect();
     };
   }, []);
