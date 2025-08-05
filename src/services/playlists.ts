@@ -22,7 +22,7 @@ interface GetPlaylistItemsParams extends PaginationQueryParams {
  */
 const getPlaylistItems = async (
   playlistId: string,
-  params: GetPlaylistItemsParams = { limit: 50 }
+  params: GetPlaylistItemsParams = { limit: 100 }
 ) => {
   return axios.get<Pagination<PlaylistItem>>(`/playlists/${playlistId}/tracks`, { params });
 };
