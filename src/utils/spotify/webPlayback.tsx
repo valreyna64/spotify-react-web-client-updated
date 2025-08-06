@@ -31,11 +31,15 @@ const WebPlayback: FC<WebPlaybackProps> = memo((props) => {
   const trackTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const currentTrackIdRef = useRef<string | null>(null);
   const extendedTimeoutTracksRef = useRef<Set<string>>(new Set());
+  const extendedTimeoutTracksUrl =
+    process.env.REACT_APP_EXTENDED_TIMEOUT_TRACKS_URL;
 
   useEffect(() => {
-    fetch(
-      'https://gist.githubusercontent.com/ochowei/8bbdfea9e0eff3fb6762218796119b7d/raw/069d2d270e8ca096fabc2dc530760374043bc7d4/extendedTimeoutTracks.json',
-    )
+    if (!extendedTimeoutTracksUrl) {
+      return;
+    }
+
+    fetch(extendedTimeoutTracksUrl)
       .then((res) => res.json())
       .then((tracks: string[]) => {
         extendedTimeoutTracksRef.current = new Set(tracks);
@@ -43,7 +47,7 @@ const WebPlayback: FC<WebPlaybackProps> = memo((props) => {
       .catch((err) => {
         console.error('Failed to load extended timeout tracks', err);
       });
-  }, []);
+  }, [extendedTimeoutTracksUrl]);
 
   const handleState = async (state: any | null) => {
     if (state) {
