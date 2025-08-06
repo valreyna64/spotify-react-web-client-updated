@@ -17,7 +17,7 @@ import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { DEFAULT_PAGE_COLOR } from '../../../constants/spotify';
 
 // Interfaces
-import { memo, type FC } from 'react';
+import { memo, type FC, useEffect, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
 interface PlaylistListProps {
@@ -29,6 +29,21 @@ export const PlaylistList: FC<PlaylistListProps> = memo(({ color }) => {
   const tracks = useAppSelector((state) => state.playlist.tracks);
   const canEdit = useAppSelector((state) => state.playlist.canEdit);
   const playlist = useAppSelector((state) => state.playlist.playlist);
+
+  const [extendedTracks, setExtendedTracks] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    const url = process.env.REACT_APP_EXTENDED_TIMEOUT_TRACKS_URL;
+    if (!url) return;
+    fetch(url)
+      .then((res) => res.json())
+      .then((tracks: string[]) => {
+        setExtendedTracks(new Set(tracks));
+      })
+      .catch((err) => {
+        console.error('Failed to load extended timeout tracks', err);
+      });
+  }, []);
 
   const hasTracks = !!playlist?.tracks?.total;
 
@@ -81,14 +96,24 @@ export const PlaylistList: FC<PlaylistListProps> = memo(({ color }) => {
                   }}
                 >
                   {tracks.map((song, index) => (
-                    <SongView song={song} key={`${song.added_at}-${song.track.id}`} index={index} />
+                    <SongView
+                      song={song}
+                      key={`${song.added_at}-${song.track.id}`}
+                      index={index}
+                      extendedTracks={extendedTracks}
+                    />
                   ))}
                 </ReactDragListView>
               </div>
             ) : (
               <div>
                 {tracks.map((song, index) => (
-                  <SongView song={song} key={`${song.added_at}-${song.track.id}`} index={index} />
+                  <SongView
+                    song={song}
+                    key={`${song.added_at}-${song.track.id}`}
+                    index={index}
+                    extendedTracks={extendedTracks}
+                  />
                 ))}
               </div>
             )}
