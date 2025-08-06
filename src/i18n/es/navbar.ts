@@ -16,4 +16,5 @@ export const navbar = {
   GRID: 'Grilla',
   LIST: 'Lista',
   'Log In': 'Iniciar sesión',
+  'Log Out': 'Cerrar sesión',
 };

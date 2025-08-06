@@ -57,6 +57,15 @@ export const fetchUser = createAsyncThunk('auth/fetchUser', async () => {
   return response.data;
 });
 
+export const logout = createAsyncThunk('auth/logout', async () => {
+  clearRefreshTokenTimer();
+  localStorage.removeItem('access_token');
+  localStorage.removeItem('public_access_token');
+  localStorage.removeItem('refresh_token');
+  localStorage.removeItem('code_verifier');
+  delete axios.defaults.headers.common['Authorization'];
+});
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -80,10 +89,16 @@ const authSlice = createSlice({
       state.user = action.payload;
       state.requesting = false;
     });
+    builder.addCase(logout.fulfilled, (state) => {
+      state.token = undefined;
+      state.user = undefined;
+      state.playerLoaded = false;
+      state.requesting = false;
+    });
   },
 });
 
-export const authActions = { ...authSlice.actions, loginToSpotify, fetchUser };
+export const authActions = { ...authSlice.actions, loginToSpotify, fetchUser, logout };
 
 let refreshTokenTimeout: ReturnType<typeof setTimeout> | undefined;
 
