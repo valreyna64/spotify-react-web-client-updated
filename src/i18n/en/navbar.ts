@@ -10,4 +10,5 @@ export const navbar = {
   COMPACT: 'Compact',
   GRID: 'Grid',
   LIST: 'List',
+  'Log Out': 'Log Out',
 };

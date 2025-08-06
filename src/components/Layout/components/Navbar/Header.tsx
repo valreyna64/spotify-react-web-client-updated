@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 
 // Redux
 import { uiActions } from '../../../../store/slices/ui';
-import { loginToSpotify } from '../../../../store/slices/auth';
+import { loginToSpotify, logout } from '../../../../store/slices/auth';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 
 // Constants
@@ -45,7 +45,7 @@ const LoginButton = () => {
 
 const Header = ({ opacity }: { opacity: number; title?: string }) => {
   const { t } = useTranslation(['navbar']);
-
+  const dispatch = useAppDispatch();
   const user = useAppSelector(
     (state) => state.auth.user,
     (prev, next) => prev?.id === next?.id
@@ -64,19 +64,26 @@ const Header = ({ opacity }: { opacity: number; title?: string }) => {
           </div> */}
 
           {user ? (
-            <div className='avatar-container'>
-              <Link to={`/users/${user!.id}`}>
-                <img
-                  className='avatar'
-                  id='user-avatar'
-                  alt='User Avatar'
-                  style={{ marginTop: -1 }}
-                  src={
-                    user?.images && user.images.length ? user.images[0].url : ARTISTS_DEFAULT_IMAGE
-                  }
-                />
-              </Link>
-            </div>
+            <>
+              <div className='avatar-container'>
+                <Link to={`/users/${user!.id}`}>
+                  <img
+                    className='avatar'
+                    id='user-avatar'
+                    alt='User Avatar'
+                    style={{ marginTop: -1 }}
+                    src={
+                      user?.images && user.images.length ? user.images[0].url : ARTISTS_DEFAULT_IMAGE
+                    }
+                  />
+                </Link>
+              </div>
+              <WhiteButton
+                size='small'
+                title={t('Log Out')}
+                onClick={() => dispatch(logout())}
+              />
+            </>
           ) : (
             <LoginButton />
           )}
