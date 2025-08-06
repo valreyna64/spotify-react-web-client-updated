@@ -33,7 +33,9 @@ const WebPlayback: FC<WebPlaybackProps> = memo((props) => {
   const extendedTimeoutTracksRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
-    fetch('/extendedTimeoutTracks.json')
+    fetch(
+      'https://gist.githubusercontent.com/ochowei/8bbdfea9e0eff3fb6762218796119b7d/raw/069d2d270e8ca096fabc2dc530760374043bc7d4/extendedTimeoutTracks.json',
+    )
       .then((res) => res.json())
       .then((tracks: string[]) => {
         extendedTimeoutTracksRef.current = new Set(tracks);
