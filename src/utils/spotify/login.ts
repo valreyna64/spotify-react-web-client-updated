@@ -63,23 +63,14 @@ const logInWithSpotify = async (anonymous?: boolean) => {
   const hashed = await sha256(codeVerifier);
   const codeChallenge = base64encode(hashed);
 
-  if (anonymous) {
-    authUrl.search = new URLSearchParams({
-      client_id,
-      scope: '',
-      redirect_uri,
-      response_type: 'token',
-    }).toString();
-  } else {
-    authUrl.search = new URLSearchParams({
-      client_id,
-      redirect_uri,
-      response_type: 'code',
-      scope: SCOPES.join(' '),
-      code_challenge_method: 'S256',
-      code_challenge: codeChallenge,
-    }).toString();
-  }
+  authUrl.search = new URLSearchParams({
+    client_id,
+    redirect_uri,
+    response_type: 'code',
+    scope: anonymous ? '' : SCOPES.join(' '),
+    code_challenge_method: 'S256',
+    code_challenge: codeChallenge,
+  }).toString();
   window.location.href = authUrl.toString();
 };
 
