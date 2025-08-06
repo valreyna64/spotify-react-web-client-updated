@@ -7,10 +7,11 @@ import useIsMobile from '../../../../../utils/isMobile';
 
 interface QueueSongDetailsProps {
   song: Spotify.Track | Episode;
-  isPlaying: boolean;
+  isPlaying?: boolean;
+  durationText: string;
 }
 
-const QueueSongDetails: FC<QueueSongDetailsProps> = memo(({ song, isPlaying }) => {
+const QueueSongDetails: FC<QueueSongDetailsProps> = memo(({ song, isPlaying, durationText }) => {
   const isMobile = useIsMobile();
   const queue = useAppSelector((state) => state.queue.queue);
   const isPaused = useAppSelector((state) => state.spotify.state?.paused);
@@ -76,6 +77,7 @@ const QueueSongDetails: FC<QueueSongDetailsProps> = memo(({ song, isPlaying }) =
             className={`text-white font-bold song-title ${isPlaying ? 'active' : ''}`}
           >
             {song.name}
+            <span className='song-duration text-gray-400 text-xs ml-2'>({durationText})</span>
           </p>
           <p className='text-gray-200 song-artist' title={artists}>
             {artists}
