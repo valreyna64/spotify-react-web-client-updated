@@ -6,15 +6,17 @@ import ForwardBackwardsButton from './ForwardBackwardsButton';
 import { useTranslation } from 'react-i18next';
 import { memo } from 'react';
 import { FaSpotify } from 'react-icons/fa6';
+import { useNavigate } from 'react-router-dom';
 
 const HistoryNavigation = memo(() => {
   const { t } = useTranslation(['navbar']);
+  const navigate = useNavigate();
   return (
     <Space>
       <NavigationButton
-        text={t('Source code')}
+        text={t('Home')}
         onClick={() => {
-          window.open('https://github.com/francoborrelli/portfolio', '_blank');
+          navigate('/');
         }}
         icon={<FaSpotify size={25} fill='white' />}
       />
