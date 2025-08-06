@@ -6,7 +6,6 @@ export const navbar = {
   'Expand your library': 'Expandir tu biblioteca',
   Language: 'Idioma',
   'Contact me': 'Contactame',
-  'Source code': 'Código fuente',
   SearchPlaceholder: '¿Qué querés reproducir?',
   'Create a new Playlist': 'Crear una nueva Playlist',
   Playlists: 'Playlists',
