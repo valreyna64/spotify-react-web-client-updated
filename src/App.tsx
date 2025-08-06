@@ -64,7 +64,7 @@ const SpotifyContainer: FC<{ children: any }> = memo(({ children }) => {
   const dispatch = useAppDispatch();
 
   const user = useAppSelector((state) => !!state.auth.user);
-  const token = useAppSelector((state) => state.auth.token);
+  // Removed token selector; access token is retrieved directly from localStorage when needed
   const requesting = useAppSelector((state) => state.auth.requesting);
 
   useEffect(() => {
@@ -89,7 +89,9 @@ const SpotifyContainer: FC<{ children: any }> = memo(({ children }) => {
       playerInitialVolume: 1.0,
       playerRefreshRateMs: 1000,
       playerName: 'Spotify React Player',
-      onPlayerRequestAccessToken: () => Promise.resolve(token!),
+      // Read the latest access token from localStorage each time the player requests it
+      onPlayerRequestAccessToken: () =>
+        Promise.resolve(getFromLocalStorageWithExpiry('access_token') || ''),
       onPlayerLoading: () => {},
       onPlayerWaitingForDevice: () => {
         dispatch(authActions.setPlayerLoaded({ playerLoaded: true }));
@@ -101,7 +103,7 @@ const SpotifyContainer: FC<{ children: any }> = memo(({ children }) => {
         dispatch(authActions.setPlayerLoaded({ playerLoaded: true }));
       },
     }),
-    [dispatch, token]
+    [dispatch]
   );
 
   if (!user) return <Spinner loading={requesting}>{children}</Spinner>;
