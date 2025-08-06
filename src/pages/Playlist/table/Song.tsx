@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { PlaylistItemWithSaved } from '../../../interfaces/playlists';
 import SongView, { SongViewComponents } from '../../../components/SongsTable/songView';
+import { msToTime } from '../../../utils';
 
 // Redux
 import { playlistActions } from '../../../store/slices/playlist';
@@ -9,10 +10,11 @@ import { useAppDispatch, useAppSelector } from '../../../store/store';
 interface SongProps {
   index: number;
   song: PlaylistItemWithSaved;
+  extendedTracks: Set<string>;
 }
 
 export const Song = (props: SongProps) => {
-  const { song, index } = props;
+  const { song, index, extendedTracks } = props;
 
   const dispatch = useAppDispatch();
   const view = useAppSelector((state) => state.playlist.view);
@@ -44,7 +46,19 @@ export const Song = (props: SongProps) => {
         SongViewComponents.Album,
         SongViewComponents.AddedAt,
         (props) => <SongViewComponents.AddToLiked {...props} onLikeRefresh={toggleLike} />,
-        SongViewComponents.Time,
+        (props) => {
+          const duration = extendedTracks.has(props.song.name)
+            ? '0:50'
+            : msToTime(props.song.duration_ms);
+          return (
+            <p
+              className='text-right '
+              style={{ flex: 1, display: 'flex', justifyContent: 'end' }}
+            >
+              {duration}
+            </p>
+          );
+        },
         SongViewComponents.Actions,
       ]}
     />
