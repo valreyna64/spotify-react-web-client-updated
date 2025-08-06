@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { NowPlayingLayout } from '../layout';
 import { useAppSelector } from '../../../../../store/store';
 
-import QueueSongDetailsProps from './SongDetails';
+import QueueSongDetails from './SongDetails';
 
 interface NowPlayingProps {
   extendedTracks: Set<string>;
@@ -23,7 +23,7 @@ const NowPlaying = ({ extendedTracks }: NowPlayingProps) => {
     <div>
       <p className='playing-section-title'>{t('Now playing')}</p>
       <div style={{ margin: 5 }}>
-        <QueueSongDetailsProps song={song} isPlaying={true} durationText={durationText} />
+        <QueueSongDetails song={song} isPlaying={true} durationText={durationText} />
       </div>
     </div>
   );
@@ -46,7 +46,7 @@ const Queueing = ({ extendedTracks }: QueueingProps) => {
       <div style={{ margin: 5 }}>
         {queue.map((q, index) => {
           const durationText = extendedTracks.has(q.name) ? '0:00-0:50' : 'full song';
-          return <QueueSongDetailsProps key={index} song={q} durationText={durationText} />;
+          return <QueueSongDetails key={index} song={q} durationText={durationText} />;
         })}
       </div>
     </div>

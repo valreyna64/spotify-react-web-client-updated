@@ -3,10 +3,11 @@ import { Pause, Play } from '../../../../Icons';
 import { useAppSelector } from '../../../../../store/store';
 import { playerService } from '../../../../../services/player';
 import { Episode } from '../../../../../interfaces/episode';
+import type { Track as ApiTrack } from '../../../../../interfaces/track';
 import useIsMobile from '../../../../../utils/isMobile';
 
 interface QueueSongDetailsProps {
-  song: Spotify.Track | Episode;
+  song: Spotify.Track | ApiTrack | Episode;
   isPlaying?: boolean;
   durationText: string;
 }
