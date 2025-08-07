@@ -2,14 +2,12 @@ import { Space } from 'antd';
 import { FC, memo, RefObject } from 'react';
 import Chip from '../../../../components/Chip';
 import { PageHeader } from '../../../../components/Layout/components/Header';
-import { WhiteButton } from '../../../../components/Button';
 
 // Utils
 import { useTranslation } from 'react-i18next';
 
 // Redux
 import { homeActions } from '../../../../store/slices/home';
-import { loginToSpotify } from '../../../../store/slices/auth';
 import { useAppDispatch, useAppSelector } from '../../../../store/store';
 
 interface HomeHeaderProps {
@@ -41,20 +39,11 @@ const ChipsSection = memo(() => {
 
 export const HomeHeader: FC<HomeHeaderProps> = (props) => {
   const user = useAppSelector((state) => state.auth.user);
-  const dispatch = useAppDispatch();
-  const [t] = useTranslation(['home']);
 
   const { container, sectionContainer, color } = props;
 
   if (!user) {
-    return (
-      <PageHeader color={color} container={container} sectionContainer={sectionContainer}>
-        <WhiteButton
-          title={t('Log In')}
-          onClick={() => dispatch(loginToSpotify(false))}
-        />
-      </PageHeader>
-    );
+    return null;
   }
 
   return (
