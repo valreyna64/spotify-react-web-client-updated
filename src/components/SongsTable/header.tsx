@@ -61,7 +61,7 @@ const Artists = (props: ItemProps) => {
 
 const Time = (props: ItemProps) => {
   return (
-    <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+    <div style={{ flex: 2, display: 'flex', justifyContent: 'flex-end' }}>
       <h3 style={{ marginRight: 10, textAlign: 'right' }}>
         <Clock />
       </h3>

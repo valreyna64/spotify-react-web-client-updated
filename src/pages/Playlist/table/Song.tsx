@@ -61,7 +61,7 @@ export const Song = (props: SongProps) => {
               <p
                 className='text-right '
                 style={{
-                  flex: 1,
+                  flex: 2,
                   display: 'flex',
                   justifyContent: 'end',
                   alignItems: 'center',
