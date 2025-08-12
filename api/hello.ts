@@ -1,5 +1,6 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+import type { IncomingMessage, ServerResponse } from 'http';
 
-export default function handler(req: VercelRequest, res: VercelResponse): void {
-  res.status(200).send('Hello world');
+export default function handler(req: IncomingMessage, res: ServerResponse): void {
+  res.statusCode = 200;
+  res.end('Hello world');
 }
