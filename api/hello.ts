@@ -1,7 +1,5 @@
-export const config = {
-  runtime: 'edge',
-};
+import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-export default function handler(req: Request): Response {
-  return new Response('Hello world');
+export default function handler(req: VercelRequest, res: VercelResponse): void {
+  res.status(200).send('Hello world');
 }
