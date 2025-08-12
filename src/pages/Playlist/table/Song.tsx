@@ -31,6 +31,29 @@ export const Song = (props: SongProps) => {
   const [startTime, setStartTime] = useState<Dayjs | null>(null);
   const [seconds, setSeconds] = useState<number | null>(null);
 
+  const trackDurationMs = song.track.duration_ms;
+  const maxMinutes = Math.floor(trackDurationMs / 60000);
+  const maxSeconds = Math.floor((trackDurationMs % 60000) / 1000);
+  const totalSeconds = Math.floor(trackDurationMs / 1000);
+
+  const disabledTime = () => ({
+    disabledMinutes: (_hour: number) =>
+      Array.from({ length: 59 - maxMinutes }, (_, i) => maxMinutes + 1 + i),
+    disabledSeconds: (_hour: number, minute: number) =>
+      minute === maxMinutes
+        ? Array.from(
+            { length: 59 - maxSeconds },
+            (_, i) => maxSeconds + 1 + i,
+          )
+        : [],
+  });
+
+  const remainingSeconds = Math.max(
+    totalSeconds -
+      (startTime ? startTime.minute() * 60 + startTime.second() : 0),
+    0,
+  );
+
   const toggleLike = useCallback(() => {
     dispatch(playlistActions.setTrackLikeState({ id: song.track.id, saved: !song.saved }));
   }, [dispatch, song.saved, song.track.id]);
@@ -91,6 +114,7 @@ export const Song = (props: SongProps) => {
                   value={startTime}
                   onChange={(value) => setStartTime(value)}
                   format='mm:ss'
+                  disabledTime={disabledTime}
                   style={{ width: '100%' }}
                 />
                 <InputNumber
@@ -99,6 +123,7 @@ export const Song = (props: SongProps) => {
                   onChange={(value) =>
                     setSeconds(typeof value === 'number' ? value : null)
                   }
+                  max={remainingSeconds}
                   style={{ width: '100%' }}
                 />
               </Modal>
