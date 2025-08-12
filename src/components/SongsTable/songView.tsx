@@ -271,7 +271,7 @@ const Time = ({ song }: ComponentProps) => {
     <>
       <p
         className='text-right '
-        style={{ flex: 1, display: 'flex', justifyContent: 'end', alignItems: 'center' }}
+        style={{ flex: 2, display: 'flex', justifyContent: 'end', alignItems: 'center' }}
       >
         {msToTime(song.duration_ms)}
         <button className='ml-2 text-xs' onClick={() => setOpen(true)}>
