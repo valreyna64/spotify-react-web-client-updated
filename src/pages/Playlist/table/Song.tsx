@@ -3,6 +3,7 @@ import { PlaylistItemWithSaved } from '../../../interfaces/playlists';
 import SongView, { SongViewComponents } from '../../../components/SongsTable/songView';
 import { msToTime } from '../../../utils';
 import { Modal, Input, InputNumber } from 'antd';
+import { FaGear } from 'react-icons/fa6';
 
 // Redux
 import { playlistActions } from '../../../store/slices/playlist';
@@ -67,8 +68,12 @@ export const Song = (props: SongProps) => {
                 }}
               >
                 {duration}
-                <button className='ml-2 text-xs' onClick={() => setOpen(true)}>
-                  設定
+                <button
+                  className='ml-2 text-xs'
+                  onClick={() => setOpen(true)}
+                  aria-label='settings'
+                >
+                  <FaGear />
                 </button>
               </p>
               <Modal
