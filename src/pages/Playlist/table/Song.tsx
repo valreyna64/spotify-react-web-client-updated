@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 import { PlaylistItemWithSaved } from '../../../interfaces/playlists';
 import SongView, { SongViewComponents } from '../../../components/SongsTable/songView';
 import { msToTime } from '../../../utils';
-import { Modal, Input, InputNumber } from 'antd';
+import { Modal, InputNumber } from 'antd';
 import { FaGear } from 'react-icons/fa6';
 
 // Redux
@@ -24,7 +24,8 @@ export const Song = (props: SongProps) => {
   const playlist = useAppSelector((state) => state.playlist.playlist);
 
   const [open, setOpen] = useState(false);
-  const [start, setStart] = useState('');
+  const [startMinutes, setStartMinutes] = useState<number | null>(null);
+  const [startSeconds, setStartSeconds] = useState<number | null>(null);
   const [seconds, setSeconds] = useState<number | null>(null);
 
   const toggleLike = useCallback(() => {
@@ -82,14 +83,35 @@ export const Song = (props: SongProps) => {
                 onCancel={() => setOpen(false)}
                 title='設定播放時間'
               >
-                <Input
-                  placeholder='開始時間'
-                  value={start}
-                  onChange={(e) => setStart(e.target.value)}
+                <div
+                  style={{ display: 'flex', alignItems: 'center', gap: 8 }}
                   className='mb-2'
-                />
+                >
+                  <InputNumber
+                    placeholder='分'
+                    value={startMinutes ?? undefined}
+                    onChange={(value) =>
+                      setStartMinutes(
+                        typeof value === 'number' ? value : null
+                      )
+                    }
+                    min={0}
+                  />
+                  <span>:</span>
+                  <InputNumber
+                    placeholder='秒'
+                    value={startSeconds ?? undefined}
+                    onChange={(value) =>
+                      setStartSeconds(
+                        typeof value === 'number' ? value : null
+                      )
+                    }
+                    min={0}
+                    max={59}
+                  />
+                </div>
                 <InputNumber
-                  placeholder='秒數'
+                  placeholder='播放秒數'
                   value={seconds ?? undefined}
                   onChange={(value) =>
                     setSeconds(typeof value === 'number' ? value : null)
