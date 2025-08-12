@@ -1,4 +1,4 @@
-import { Tooltip, Modal, Input, InputNumber } from 'antd';
+import { Tooltip, Modal, InputNumber } from 'antd';
 import ReactTimeAgo from 'react-time-ago';
 import { useCallback, useMemo, useState } from 'react';
 import { MenuIcon, Pause, Play } from '../Icons';
@@ -264,7 +264,8 @@ const Actions = ({ song }: ComponentProps) => {
 
 const Time = ({ song }: ComponentProps) => {
   const [open, setOpen] = useState(false);
-  const [start, setStart] = useState('');
+  const [startMinutes, setStartMinutes] = useState<number | null>(null);
+  const [startSeconds, setStartSeconds] = useState<number | null>(null);
   const [seconds, setSeconds] = useState<number | null>(null);
 
   return (
@@ -284,16 +285,35 @@ const Time = ({ song }: ComponentProps) => {
         onCancel={() => setOpen(false)}
         title='設定播放時間'
       >
-        <Input
-          placeholder='開始時間'
-          value={start}
-          onChange={(e) => setStart(e.target.value)}
+        <div
+          style={{ display: 'flex', alignItems: 'center', gap: 8 }}
           className='mb-2'
-        />
+        >
+          <InputNumber
+            placeholder='分'
+            value={startMinutes ?? undefined}
+            onChange={(value) =>
+              setStartMinutes(typeof value === 'number' ? value : null)
+            }
+            min={0}
+          />
+          <span>:</span>
+          <InputNumber
+            placeholder='秒'
+            value={startSeconds ?? undefined}
+            onChange={(value) =>
+              setStartSeconds(typeof value === 'number' ? value : null)
+            }
+            min={0}
+            max={59}
+          />
+        </div>
         <InputNumber
-          placeholder='秒數'
+          placeholder='播放秒數'
           value={seconds ?? undefined}
-          onChange={(value) => setSeconds(typeof value === 'number' ? value : null)}
+          onChange={(value) =>
+            setSeconds(typeof value === 'number' ? value : null)
+          }
           style={{ width: '100%' }}
         />
       </Modal>
