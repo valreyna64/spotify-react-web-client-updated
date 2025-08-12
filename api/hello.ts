@@ -1,7 +1,6 @@
-export const config = {
-  runtime: 'edge',
-};
+import type { IncomingMessage, ServerResponse } from 'http';
 
-export default function handler(req: Request): Response {
-  return new Response('Hello world');
+export default function handler(req: IncomingMessage, res: ServerResponse): void {
+  res.statusCode = 200;
+  res.end('Hello world');
 }
