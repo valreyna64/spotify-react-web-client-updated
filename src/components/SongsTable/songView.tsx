@@ -210,7 +210,7 @@ const AddedAt = ({ addedAt }: ComponentProps) => {
   const language = useAppSelector((state) => state.language.language);
   if (!addedAt) return null;
   return (
-    <p className='text-left tablet-hidden' style={{ flex: 3 }}>
+    <p className='text-left tablet-hidden' style={{ flex: 1.5 }}>
       <ReactTimeAgo date={new Date(addedAt)} locale={language === 'es' ? 'es-AR' : undefined} />
     </p>
   );
