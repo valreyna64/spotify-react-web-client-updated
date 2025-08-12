@@ -1,13 +1,17 @@
 import { useCallback, useState } from 'react';
+import dayjs, { type Dayjs } from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { PlaylistItemWithSaved } from '../../../interfaces/playlists';
 import SongView, { SongViewComponents } from '../../../components/SongsTable/songView';
 import { msToTime } from '../../../utils';
-import { Modal, InputNumber } from 'antd';
+import { Modal, InputNumber, TimePicker } from 'antd';
 import { FaGear } from 'react-icons/fa6';
 
 // Redux
 import { playlistActions } from '../../../store/slices/playlist';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
+
+dayjs.extend(customParseFormat);
 
 interface SongProps {
   index: number;
@@ -24,8 +28,7 @@ export const Song = (props: SongProps) => {
   const playlist = useAppSelector((state) => state.playlist.playlist);
 
   const [open, setOpen] = useState(false);
-  const [startMinutes, setStartMinutes] = useState<number | null>(null);
-  const [startSeconds, setStartSeconds] = useState<number | null>(null);
+  const [startTime, setStartTime] = useState<Dayjs | null>(null);
   const [seconds, setSeconds] = useState<number | null>(null);
 
   const toggleLike = useCallback(() => {
@@ -83,33 +86,13 @@ export const Song = (props: SongProps) => {
                 onCancel={() => setOpen(false)}
                 title='設定播放時間'
               >
-                <div
-                  style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+                <TimePicker
                   className='mb-2'
-                >
-                  <InputNumber
-                    placeholder='分'
-                    value={startMinutes ?? undefined}
-                    onChange={(value) =>
-                      setStartMinutes(
-                        typeof value === 'number' ? value : null
-                      )
-                    }
-                    min={0}
-                  />
-                  <span>:</span>
-                  <InputNumber
-                    placeholder='秒'
-                    value={startSeconds ?? undefined}
-                    onChange={(value) =>
-                      setStartSeconds(
-                        typeof value === 'number' ? value : null
-                      )
-                    }
-                    min={0}
-                    max={59}
-                  />
-                </div>
+                  value={startTime}
+                  onChange={(value) => setStartTime(value)}
+                  format='mm:ss'
+                  style={{ width: '100%' }}
+                />
                 <InputNumber
                   placeholder='播放秒數'
                   value={seconds ?? undefined}
