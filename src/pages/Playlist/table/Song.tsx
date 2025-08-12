@@ -1,13 +1,17 @@
 import { useCallback, useState } from 'react';
+import dayjs, { type Dayjs } from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { PlaylistItemWithSaved } from '../../../interfaces/playlists';
 import SongView, { SongViewComponents } from '../../../components/SongsTable/songView';
 import { msToTime } from '../../../utils';
-import { Modal, InputNumber } from 'antd';
+import { Modal, InputNumber, TimePicker } from 'antd';
 import { FaGear } from 'react-icons/fa6';
 
 // Redux
 import { playlistActions } from '../../../store/slices/playlist';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
+
+dayjs.extend(customParseFormat);
 
 interface SongProps {
   index: number;
@@ -24,9 +28,31 @@ export const Song = (props: SongProps) => {
   const playlist = useAppSelector((state) => state.playlist.playlist);
 
   const [open, setOpen] = useState(false);
-  const [startMinutes, setStartMinutes] = useState<number | null>(null);
-  const [startSeconds, setStartSeconds] = useState<number | null>(null);
+  const [startTime, setStartTime] = useState<Dayjs | null>(null);
   const [seconds, setSeconds] = useState<number | null>(null);
+
+  const trackDurationMs = song.track.duration_ms;
+  const maxMinutes = Math.floor(trackDurationMs / 60000);
+  const maxSeconds = Math.floor((trackDurationMs % 60000) / 1000);
+  const totalSeconds = Math.floor(trackDurationMs / 1000);
+
+  const disabledTime = () => ({
+    disabledMinutes: (_hour: number) =>
+      Array.from({ length: 59 - maxMinutes }, (_, i) => maxMinutes + 1 + i),
+    disabledSeconds: (_hour: number, minute: number) =>
+      minute === maxMinutes
+        ? Array.from(
+            { length: 59 - maxSeconds },
+            (_, i) => maxSeconds + 1 + i,
+          )
+        : [],
+  });
+
+  const remainingSeconds = Math.max(
+    totalSeconds -
+      (startTime ? startTime.minute() * 60 + startTime.second() : 0),
+    0,
+  );
 
   const toggleLike = useCallback(() => {
     dispatch(playlistActions.setTrackLikeState({ id: song.track.id, saved: !song.saved }));
@@ -83,39 +109,21 @@ export const Song = (props: SongProps) => {
                 onCancel={() => setOpen(false)}
                 title='設定播放時間'
               >
-                <div
-                  style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+                <TimePicker
                   className='mb-2'
-                >
-                  <InputNumber
-                    placeholder='分'
-                    value={startMinutes ?? undefined}
-                    onChange={(value) =>
-                      setStartMinutes(
-                        typeof value === 'number' ? value : null
-                      )
-                    }
-                    min={0}
-                  />
-                  <span>:</span>
-                  <InputNumber
-                    placeholder='秒'
-                    value={startSeconds ?? undefined}
-                    onChange={(value) =>
-                      setStartSeconds(
-                        typeof value === 'number' ? value : null
-                      )
-                    }
-                    min={0}
-                    max={59}
-                  />
-                </div>
+                  value={startTime}
+                  onChange={(value) => setStartTime(value)}
+                  format='mm:ss'
+                  disabledTime={disabledTime}
+                  style={{ width: '100%' }}
+                />
                 <InputNumber
                   placeholder='播放秒數'
                   value={seconds ?? undefined}
                   onChange={(value) =>
                     setSeconds(typeof value === 'number' ? value : null)
                   }
+                  max={remainingSeconds}
                   style={{ width: '100%' }}
                 />
               </Modal>
