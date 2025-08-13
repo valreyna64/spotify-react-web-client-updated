@@ -10,7 +10,6 @@
       "use": "@vercel/node"
     }
   ],
-  "checks": { "paths": ["/api/hello"] },
   "rewrites": [
     {
       "source": "/((?!api/).*)",
