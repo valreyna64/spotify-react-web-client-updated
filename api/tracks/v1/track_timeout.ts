@@ -26,7 +26,7 @@ function handler(req: IncomingMessage, res: ServerResponse) {
   ];
   res.statusCode = 200;
   res.setHeader('Content-Type', 'application/json');
-  res.end(JSON.stringify({ tracks }));
+  res.end(JSON.stringify(tracks);
 }
 
 // 關鍵：用 CommonJS 匯出
