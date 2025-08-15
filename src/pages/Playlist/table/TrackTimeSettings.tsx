@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import dayjs, { type Dayjs } from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { Modal, InputNumber, TimePicker } from 'antd';
+import { ConfigProvider, Modal, InputNumber, TimePicker, theme } from 'antd';
 import { FaGear } from 'react-icons/fa6';
 import { msToTime, timeToMs } from '../../../utils';
 import { type Track } from '../../../interfaces/track';
@@ -70,34 +70,36 @@ export const TrackTimeSettings = (props: TrackTimeSettingsProps) => {
           <FaGear />
         </button>
       </p>
-      <Modal
-        destroyOnClose
-        className="track-time-settings-modal"
-        open={open}
-        onOk={() => setOpen(false)}
-        onCancel={() => setOpen(false)}
-        title='設定播放時間'
-      >
-        <TimePicker
-          className='mb-2 w-full track-time-picker'
-          value={startTime}
-          onChange={(value) => setStartTime(value)}
-          format='mm:ss'
-          disabledTime={disabledTime}
-          showNow={false}
-          inputReadOnly
-        />
-        <InputNumber
-          placeholder='播放秒數'
-          className='duration-input'
-          value={seconds ?? undefined}
-          onChange={(value) =>
-            setSeconds(typeof value === 'number' ? value : null)
-          }
-          max={remainingSeconds}
-          step="0.1"
-        />
-      </Modal>
+      <ConfigProvider theme={{ algorithm: theme.darkAlgorithm }}>
+        <Modal
+          destroyOnClose
+          className="track-time-settings-modal"
+          open={open}
+          onOk={() => setOpen(false)}
+          onCancel={() => setOpen(false)}
+          title='設定播放時間'
+        >
+          <TimePicker
+            className='mb-2 w-full track-time-picker'
+            value={startTime}
+            onChange={(value) => setStartTime(value)}
+            format='mm:ss'
+            disabledTime={disabledTime}
+            showNow={false}
+            inputReadOnly
+          />
+          <InputNumber
+            placeholder='播放秒數'
+            className='duration-input'
+            value={seconds ?? undefined}
+            onChange={(value) =>
+              setSeconds(typeof value === 'number' ? value : null)
+            }
+            max={remainingSeconds}
+            step="0.1"
+          />
+        </Modal>
+      </ConfigProvider>
     </>
   );
 };
