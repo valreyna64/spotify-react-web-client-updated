@@ -85,6 +85,7 @@ export const TrackTimeSettings = (props: TrackTimeSettingsProps) => {
           format='mm:ss'
           disabledTime={disabledTime}
           showNow={false}
+          inputReadOnly
         />
         <InputNumber
           placeholder='播放秒數'
@@ -94,6 +95,7 @@ export const TrackTimeSettings = (props: TrackTimeSettingsProps) => {
             setSeconds(typeof value === 'number' ? value : null)
           }
           max={remainingSeconds}
+          step="0.1"
         />
       </Modal>
     </>
