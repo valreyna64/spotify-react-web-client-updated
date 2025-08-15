@@ -3,7 +3,7 @@ import dayjs, { type Dayjs } from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { PlaylistItemWithSaved } from '../../../interfaces/playlists';
 import SongView, { SongViewComponents } from '../../../components/SongsTable/songView';
-import { msToTime } from '../../../utils';
+import { msToTime, timeToMs } from '../../../utils';
 import { Modal, InputNumber, TimePicker } from 'antd';
 import { FaGear } from 'react-icons/fa6';
 
@@ -82,7 +82,9 @@ export const Song = (props: SongProps) => {
         (props) => {
           const info = extendedTracks.get(props.song.name);
           const duration = info
-            ? msToTime(info.duration * 1000)
+            ? `${info.start}-${msToTime(
+                timeToMs(info.start) + info.duration * 1000,
+              )}`
             : msToTime(props.song.duration_ms);
           return (
             <>
