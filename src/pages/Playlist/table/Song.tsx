@@ -113,21 +113,21 @@ export const Song = (props: SongProps) => {
                 title='設定播放時間'
               >
                 <TimePicker
-                  className='mb-2'
+                  className='mb-2 w-full'
                   value={startTime}
                   onChange={(value) => setStartTime(value)}
                   format='mm:ss'
                   disabledTime={disabledTime}
-                  style={{ width: '100%' }}
+                  showNow={false}
                 />
                 <InputNumber
                   placeholder='播放秒數'
+                  className='w-full'
                   value={seconds ?? undefined}
                   onChange={(value) =>
                     setSeconds(typeof value === 'number' ? value : null)
                   }
                   max={remainingSeconds}
-                  style={{ width: '100%' }}
                 />
               </Modal>
             </>
