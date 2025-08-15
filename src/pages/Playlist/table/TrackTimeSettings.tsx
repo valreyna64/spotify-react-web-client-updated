@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import dayjs, { type Dayjs } from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import {
@@ -27,6 +27,21 @@ export const TrackTimeSettings = (props: TrackTimeSettingsProps) => {
   const [isCustomTimeEnabled, setIsCustomTimeEnabled] = useState(false);
   const [startTime, setStartTime] = useState<Dayjs | null>(null);
   const [seconds, setSeconds] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (open) {
+      const info = extendedTracks.get(song.name);
+      if (info) {
+        setIsCustomTimeEnabled(true);
+        setStartTime(dayjs(info.start, 'mm:ss'));
+        setSeconds(info.duration);
+      } else {
+        setIsCustomTimeEnabled(false);
+        setStartTime(null);
+        setSeconds(null);
+      }
+    }
+  }, [open, song.name, extendedTracks]);
 
   const trackDurationMs = song.duration_ms;
   const maxMinutes = Math.floor(trackDurationMs / 60000);
