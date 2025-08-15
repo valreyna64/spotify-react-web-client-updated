@@ -1,7 +1,14 @@
 import { useState } from 'react';
 import dayjs, { type Dayjs } from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { ConfigProvider, Modal, InputNumber, TimePicker, theme } from 'antd';
+import {
+  ConfigProvider,
+  Modal,
+  InputNumber,
+  TimePicker,
+  theme,
+  Switch,
+} from 'antd';
 import { FaGear } from 'react-icons/fa6';
 import { msToTime, timeToMs } from '../../../utils';
 import { type Track } from '../../../interfaces/track';
@@ -17,6 +24,7 @@ export const TrackTimeSettings = (props: TrackTimeSettingsProps) => {
   const { song, extendedTracks } = props;
 
   const [open, setOpen] = useState(false);
+  const [isCustomTimeEnabled, setIsCustomTimeEnabled] = useState(false);
   const [startTime, setStartTime] = useState<Dayjs | null>(null);
   const [seconds, setSeconds] = useState<number | null>(null);
 
@@ -79,27 +87,38 @@ export const TrackTimeSettings = (props: TrackTimeSettingsProps) => {
           onCancel={() => setOpen(false)}
           title='設定播放時間'
         >
-          <TimePicker
-            className='mb-2 w-full track-time-picker'
-            value={startTime}
-            onChange={(value) => setStartTime(value)}
-            format='mm:ss'
-            disabledTime={disabledTime}
-            showNow={false}
-            inputReadOnly
-          />
-          <InputNumber
-            placeholder='播放秒數'
-            className='duration-input'
-            value={seconds ?? undefined}
-            onChange={(value) =>
-              setSeconds(typeof value === 'number' ? value : null)
-            }
-            max={remainingSeconds}
-            step="0.1"
-            min={0}
-            inputMode="decimal"
-          />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <Switch
+              checked={isCustomTimeEnabled}
+              onChange={setIsCustomTimeEnabled}
+            />
+            <span>自訂播放時間</span>
+          </div>
+          {isCustomTimeEnabled && (
+            <div className='mt-4'>
+              <TimePicker
+                className='mb-2 w-full track-time-picker'
+                value={startTime}
+                onChange={(value) => setStartTime(value)}
+                format='mm:ss'
+                disabledTime={disabledTime}
+                showNow={false}
+                inputReadOnly
+              />
+              <InputNumber
+                placeholder='播放秒數'
+                className='duration-input'
+                value={seconds ?? undefined}
+                onChange={(value) =>
+                  setSeconds(typeof value === 'number' ? value : null)
+                }
+                max={remainingSeconds}
+                step="0.1"
+                min={0}
+                inputMode="decimal"
+              />
+            </div>
+          )}
         </Modal>
       </ConfigProvider>
     </>
