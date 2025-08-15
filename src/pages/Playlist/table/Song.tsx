@@ -16,7 +16,7 @@ dayjs.extend(customParseFormat);
 interface SongProps {
   index: number;
   song: PlaylistItemWithSaved;
-  extendedTracks: Set<string>;
+  extendedTracks: Map<string, { start: string; duration: number }>;
 }
 
 export const Song = (props: SongProps) => {
@@ -80,8 +80,9 @@ export const Song = (props: SongProps) => {
         SongViewComponents.AddedAt,
         (props) => <SongViewComponents.AddToLiked {...props} onLikeRefresh={toggleLike} />,
         (props) => {
-          const duration = extendedTracks.has(props.song.name)
-            ? '0:50'
+          const info = extendedTracks.get(props.song.name);
+          const duration = info
+            ? msToTime(info.duration * 1000)
             : msToTime(props.song.duration_ms);
           return (
             <>

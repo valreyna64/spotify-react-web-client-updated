@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NowPlayingLayout } from '../layout';
 import { useAppSelector } from '../../../../../store/store';
+import { msToTime, timeToMs } from '../../../../../utils';
 
 import QueueSongDetails from './SongDetails';
 
 interface NowPlayingProps {
-  extendedTracks: Set<string>;
+  extendedTracks: Map<string, { start: string; duration: number }>;
 }
 
 const NowPlaying = ({ extendedTracks }: NowPlayingProps) => {
@@ -17,7 +18,10 @@ const NowPlaying = ({ extendedTracks }: NowPlayingProps) => {
   );
   if (!song) return null;
 
-  const durationText = extendedTracks.has(song.name) ? '0:00-0:50' : 'full song';
+  const info = extendedTracks.get(song.name);
+  const durationText = info
+    ? `${info.start}-${msToTime(timeToMs(info.start) + info.duration * 1000)}`
+    : 'full song';
 
   return (
     <div>
@@ -30,7 +34,7 @@ const NowPlaying = ({ extendedTracks }: NowPlayingProps) => {
 };
 
 interface QueueingProps {
-  extendedTracks: Set<string>;
+  extendedTracks: Map<string, { start: string; duration: number }>;
 }
 
 const Queueing = ({ extendedTracks }: QueueingProps) => {
@@ -45,8 +49,15 @@ const Queueing = ({ extendedTracks }: QueueingProps) => {
 
       <div style={{ margin: 5 }}>
         {queue.map((q, index) => {
-          const durationText = extendedTracks.has(q.name) ? '0:00-0:50' : 'full song';
-          return <QueueSongDetails key={index} song={q} durationText={durationText} />;
+          const info = extendedTracks.get(q.name);
+          const durationText = info
+            ? `${info.start}-${msToTime(
+                timeToMs(info.start) + info.duration * 1000,
+              )}`
+            : 'full song';
+          return (
+            <QueueSongDetails key={index} song={q} durationText={durationText} />
+          );
         })}
       </div>
     </div>
@@ -55,18 +66,26 @@ const Queueing = ({ extendedTracks }: QueueingProps) => {
 
 export const Queue = () => {
   const [t] = useTranslation(['playingBar']);
-  const [extendedTracks, setExtendedTracks] = useState<Set<string>>(new Set());
+  const [extendedTracks, setExtendedTracks] = useState<
+    Map<string, { start: string; duration: number }>
+  >(new Map());
 
   useEffect(() => {
-    const url = process.env.REACT_APP_EXTENDED_TIMEOUT_TRACKS_URL;
-    if (!url) return;
-    fetch(url)
+    fetch('/api/tracks/v2/track_timeout')
       .then((res) => res.json())
-      .then((tracks: string[]) => {
-        setExtendedTracks(new Set(tracks));
-      })
+      .then(
+        (
+          tracks: { name: string; start: string; duration: number }[],
+        ) => {
+          const map = new Map<string, { start: string; duration: number }>();
+          tracks.forEach((t) => {
+            map.set(t.name, { start: t.start, duration: t.duration });
+          });
+          setExtendedTracks(map);
+        },
+      )
       .catch((err) => {
-        console.error('Failed to load extended timeout tracks', err);
+        console.error('Failed to load track timeout data', err);
       });
   }, []);
 
