@@ -123,7 +123,7 @@ export const Song = (props: SongProps) => {
                 />
                 <InputNumber
                   placeholder='播放秒數'
-                  className='w-full track-duration-input'
+                  className='duration-input'
                   value={seconds ?? undefined}
                   onChange={(value) =>
                     setSeconds(typeof value === 'number' ? value : null)
