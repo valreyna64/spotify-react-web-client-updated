@@ -3,10 +3,10 @@
   textarea,
   .ant-picker,
   .ant-input-number {
-    background: hsla(0, 0%, 100%, 0.1) !important;
+    background: hsla(0, 0%, 100%, 0.1);
     border: 1px solid transparent;
     border-radius: 4px;
-    color: #fff !important;
+    color: #fff;
     font-family: inherit;
     font-size: 14px;
     height: 40px;
@@ -138,6 +138,17 @@ textarea::placeholder {
     opacity: 0.85;
     transform: scale(1);
   }
+}
+
+.track-time-settings-modal {
+  .ant-modal-title {
+    color: #fff;
+  }
+}
+
+.ant-picker-panel .ant-picker-ok-btn {
+  background-color: #000 !important;
+  color: #fff !important;
 }
 
 .duration-input {
