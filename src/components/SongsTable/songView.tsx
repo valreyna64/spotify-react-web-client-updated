@@ -310,11 +310,11 @@ const Time = ({ song }: ComponentProps) => {
         </div>
         <InputNumber
           placeholder='播放秒數'
+          className='duration-input'
           value={seconds ?? undefined}
           onChange={(value) =>
             setSeconds(typeof value === 'number' ? value : null)
           }
-          style={{ width: '100%' }}
         />
       </Modal>
     </>
