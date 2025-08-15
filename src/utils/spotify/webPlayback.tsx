@@ -3,6 +3,7 @@ import { useEffect, useRef, FC, memo, useCallback } from 'react';
 import { useAppDispatch } from '../../store/store';
 import { spotifyActions } from '../../store/slices/spotify';
 import { playerService } from '../../services/player';
+import { timeToMs } from '../../utils';
 
 export interface WebPlaybackProps {
   onPlayerError: (message: string) => void; // Función para manejar errores del reproductor
@@ -30,24 +31,29 @@ const WebPlayback: FC<WebPlaybackProps> = memo((props) => {
   const deviceSelectedInterval = useRef<NodeJS.Timeout | null>(null);
   const trackTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const currentTrackIdRef = useRef<string | null>(null);
-  const extendedTimeoutTracksRef = useRef<Set<string>>(new Set());
-  const extendedTimeoutTracksUrl =
-    process.env.REACT_APP_EXTENDED_TIMEOUT_TRACKS_URL;
+  const extendedTimeoutTracksRef = useRef<
+    Map<string, { start: string; duration: number }>
+  >(new Map());
+  const extendedTimeoutTracksUrl = '/api/tracks/v2/track_timeout';
 
   useEffect(() => {
-    if (!extendedTimeoutTracksUrl) {
-      return;
-    }
-
     fetch(extendedTimeoutTracksUrl)
       .then((res) => res.json())
-      .then((tracks: string[]) => {
-        extendedTimeoutTracksRef.current = new Set(tracks);
-      })
+      .then(
+        (
+          tracks: { name: string; start: string; duration: number }[],
+        ) => {
+          const map = new Map<string, { start: string; duration: number }>();
+          tracks.forEach((t) => {
+            map.set(t.name, { start: t.start, duration: t.duration });
+          });
+          extendedTimeoutTracksRef.current = map;
+        },
+      )
       .catch((err) => {
-        console.error('Failed to load extended timeout tracks', err);
+        console.error('Failed to load track timeout data', err);
       });
-  }, [extendedTimeoutTracksUrl]);
+  }, []);
 
   const handleState = async (state: any | null) => {
     if (state) {
@@ -70,10 +76,16 @@ const WebPlayback: FC<WebPlaybackProps> = memo((props) => {
             clearTimeout(trackTimeoutRef.current);
           }
 
-          if (extendedTimeoutTracksRef.current.has(trackName)) {
+          const trackInfo =
+            trackName && extendedTimeoutTracksRef.current.get(trackName);
+          if (trackInfo) {
+            const startMs = timeToMs(trackInfo.start);
+            if (startMs > 0) {
+              playerService.seekToPosition(startMs);
+            }
             trackTimeoutRef.current = setTimeout(() => {
               playerService.nextTrack();
-            }, 50000);
+            }, trackInfo.duration * 1000);
           } else {
             trackTimeoutRef.current = null;
           }

@@ -98,13 +98,11 @@ To run this project locally, follow these steps:
 4. Set up your Spotify Developer account and create a [new app](https://developer.spotify.com/dashboard/applications) to obtain your **Client ID** and **Redirect URI**. Add these to an `.env` file in the root of your project:
 
    ```
-   REACT_APP_SPOTIFY_CLIENT_ID=<your id>
-   REACT_APP_SPOTIFY_REDIRECT_URL=<your redirect uri>
-   # optional: URL returning a JSON array of track names to limit to 50 seconds
-   REACT_APP_EXTENDED_TIMEOUT_TRACKS_URL=<url>
-   ```
+    REACT_APP_SPOTIFY_CLIENT_ID=<your id>
+    REACT_APP_SPOTIFY_REDIRECT_URL=<your redirect uri>
+    ```
 
-   Optionally, set `REACT_APP_EXTENDED_TIMEOUT_TRACKS_URL` to a JSON endpoint listing tracks that should only play for 50 seconds. These tracks display a `0:00-0:50` duration in the Queue page. See [docs/extended-timeout-tracks.md](docs/extended-timeout-tracks.md) for more details.
+   Track timeout settings are defined in `/api/tracks/v2/track_timeout`. See [docs/extended-timeout-tracks.md](docs/extended-timeout-tracks.md) for details.
 
 5. Start the development server:
 

@@ -30,18 +30,26 @@ export const PlaylistList: FC<PlaylistListProps> = memo(({ color }) => {
   const canEdit = useAppSelector((state) => state.playlist.canEdit);
   const playlist = useAppSelector((state) => state.playlist.playlist);
 
-  const [extendedTracks, setExtendedTracks] = useState<Set<string>>(new Set());
+  const [extendedTracks, setExtendedTracks] = useState<
+    Map<string, { start: string; duration: number }>
+  >(new Map());
 
   useEffect(() => {
-    const url = process.env.REACT_APP_EXTENDED_TIMEOUT_TRACKS_URL;
-    if (!url) return;
-    fetch(url)
+    fetch('/api/tracks/v2/track_timeout')
       .then((res) => res.json())
-      .then((tracks: string[]) => {
-        setExtendedTracks(new Set(tracks));
-      })
+      .then(
+        (
+          tracks: { name: string; start: string; duration: number }[],
+        ) => {
+          const map = new Map<string, { start: string; duration: number }>();
+          tracks.forEach((t) => {
+            map.set(t.name, { start: t.start, duration: t.duration });
+          });
+          setExtendedTracks(map);
+        },
+      )
       .catch((err) => {
-        console.error('Failed to load extended timeout tracks', err);
+        console.error('Failed to load track timeout data', err);
       });
   }, []);
 
