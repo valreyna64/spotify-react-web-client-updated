@@ -107,13 +107,14 @@ export const Song = (props: SongProps) => {
                 </button>
               </p>
               <Modal
+                className="track-time-settings-modal"
                 open={open}
                 onOk={() => setOpen(false)}
                 onCancel={() => setOpen(false)}
                 title='設定播放時間'
               >
                 <TimePicker
-                  className='mb-2 w-full'
+                  className='mb-2 w-full track-time-picker'
                   value={startTime}
                   onChange={(value) => setStartTime(value)}
                   format='mm:ss'
@@ -122,7 +123,7 @@ export const Song = (props: SongProps) => {
                 />
                 <InputNumber
                   placeholder='播放秒數'
-                  className='w-full'
+                  className='w-full track-duration-input'
                   value={seconds ?? undefined}
                   onChange={(value) =>
                     setSeconds(typeof value === 'number' ? value : null)
