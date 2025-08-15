@@ -97,6 +97,8 @@ export const TrackTimeSettings = (props: TrackTimeSettingsProps) => {
             }
             max={remainingSeconds}
             step="0.1"
+            min={0}
+            inputMode="numeric"
           />
         </Modal>
       </ConfigProvider>
