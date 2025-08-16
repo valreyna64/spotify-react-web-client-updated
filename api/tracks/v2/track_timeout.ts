@@ -135,9 +135,46 @@ function handler(req: IncomingMessage, res: ServerResponse) {
         res.end(JSON.stringify({ error: 'Invalid JSON' }));
       }
     });
+  } else if (req.method === 'DELETE') {
+    let body = '';
+    req.on('data', (chunk) => {
+      body += chunk.toString();
+    });
+    req.on('end', async () => {
+      try {
+        const tracksToDelete = JSON.parse(body) as any[];
+
+        for (const track of tracksToDelete) {
+          if (track.id) {
+            try {
+              const key = `track:${track.id}`;
+              await fetch(`${process.env.KV_REST_API_URL}`, {
+                headers: {
+                  Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`,
+                },
+                body: JSON.stringify(['DEL', key]),
+                method: 'POST',
+              });
+            } catch (e) {
+              console.error('Failed to delete track', e);
+            }
+          }
+        }
+
+        console.log('Tracks deleted successfully:', tracksToDelete);
+
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ message: 'Tracks deleted successfully' }));
+      } catch (error) {
+        res.statusCode = 400;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ error: 'Invalid JSON' }));
+      }
+    });
   } else {
     res.statusCode = 405;
-    res.setHeader('Allow', 'GET, POST');
+    res.setHeader('Allow', 'GET, POST, DELETE');
     res.end('Method Not Allowed');
   }
 }
