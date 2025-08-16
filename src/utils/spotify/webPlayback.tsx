@@ -41,11 +41,16 @@ const WebPlayback: FC<WebPlaybackProps> = memo((props) => {
       .getTrackTimeout()
       .then(
         (
-          tracks: { name: string; start: string; duration: number }[],
+          tracks: {
+            id: string;
+            name: string;
+            start: string;
+            duration: number;
+          }[],
         ) => {
           const map = new Map<string, { start: string; duration: number }>();
           tracks.forEach((t) => {
-            map.set(t.name, { start: t.start, duration: t.duration });
+            map.set(t.id, { start: t.start, duration: t.duration });
           });
           extendedTimeoutTracksRef.current = map;
         },
@@ -66,7 +71,6 @@ const WebPlayback: FC<WebPlaybackProps> = memo((props) => {
         }
       } else {
         const newTrackId = state.track_window?.current_track?.id;
-        const trackName = state.track_window?.current_track?.name;
 
         if (
           newTrackId &&
@@ -77,7 +81,7 @@ const WebPlayback: FC<WebPlaybackProps> = memo((props) => {
           }
 
           const trackInfo =
-            trackName && extendedTimeoutTracksRef.current.get(trackName);
+            newTrackId && extendedTimeoutTracksRef.current.get(newTrackId);
           if (trackInfo) {
             const startMs = timeToMs(trackInfo.start);
             if (startMs > 0) {

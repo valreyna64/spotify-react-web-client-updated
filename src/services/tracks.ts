@@ -12,7 +12,7 @@ export const tracksService = {
   },
 
   setTrackTimeout: async (
-    tracks: { name: string; start: string; duration: number }[]
+    tracks: { id: string; name: string; start: string; duration: number }[]
   ) => {
     const access_token = getFromLocalStorageWithExpiry('access_token') as string;
     const response = await fetch('/api/tracks/v2/track_timeout', {

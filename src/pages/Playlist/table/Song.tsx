@@ -12,6 +12,7 @@ interface SongProps {
   song: PlaylistItemWithSaved;
   extendedTracks: Map<string, { start: string; duration: number }>;
   onSave: (
+    songId: string,
     songName: string,
     settings: { start: string; duration: number } | null
   ) => void;

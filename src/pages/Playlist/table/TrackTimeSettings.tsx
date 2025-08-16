@@ -19,6 +19,7 @@ interface TrackTimeSettingsProps {
   song: Track;
   extendedTracks: Map<string, { start: string; duration: number }>;
   onSave: (
+    songId: string,
     songName: string,
     settings: { start: string; duration: number } | null
   ) => void;
@@ -34,7 +35,7 @@ export const TrackTimeSettings = (props: TrackTimeSettingsProps) => {
 
   useEffect(() => {
     if (open) {
-      const info = extendedTracks.get(song.name);
+      const info = extendedTracks.get(song.id);
       if (info) {
         setIsCustomTimeEnabled(true);
         setStartTime(dayjs(info.start, 'mm:ss'));
@@ -45,7 +46,7 @@ export const TrackTimeSettings = (props: TrackTimeSettingsProps) => {
         setSeconds(null);
       }
     }
-  }, [open, song.name, extendedTracks]);
+  }, [open, song.id, extendedTracks]);
 
   const trackDurationMs = song.duration_ms;
   const maxMinutes = Math.floor(trackDurationMs / 60000);
@@ -70,7 +71,7 @@ export const TrackTimeSettings = (props: TrackTimeSettingsProps) => {
     0
   );
 
-  const info = extendedTracks.get(song.name);
+  const info = extendedTracks.get(song.id);
   const duration = info
     ? `${info.start}-${msToTime(
         timeToMs(info.start) + info.duration * 1000
@@ -80,13 +81,15 @@ export const TrackTimeSettings = (props: TrackTimeSettingsProps) => {
   const handleOk = () => {
     if (isCustomTimeEnabled) {
       if (startTime && seconds !== null) {
-        onSave(song.name, {
+        onSave(
+          song.id,
+          song.name, {
           start: startTime.format('mm:ss'),
           duration: seconds,
         });
       }
     } else {
-      onSave(song.name, null);
+      onSave(song.id, song.name, null);
     }
     setOpen(false);
   };

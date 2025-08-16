@@ -40,11 +40,16 @@ export const PlaylistList: FC<PlaylistListProps> = memo(({ color }) => {
       .getTrackTimeout()
       .then(
         (
-          tracks: { name: string; start: string; duration: number }[],
+          tracks: {
+            id: string;
+            name: string;
+            start: string;
+            duration: number;
+          }[],
         ) => {
           const map = new Map<string, { start: string; duration: number }>();
           tracks.forEach((t) => {
-            map.set(t.name, { start: t.start, duration: t.duration });
+            map.set(t.id, { start: t.start, duration: t.duration });
           });
           setExtendedTracks(map);
         },
@@ -55,23 +60,28 @@ export const PlaylistList: FC<PlaylistListProps> = memo(({ color }) => {
   }, []);
 
   const handleSaveTrackSettings = (
+    songId: string,
     songName: string,
     settings: { start: string; duration: number } | null
   ) => {
     const newExtendedTracks = new Map(extendedTracks);
     if (settings) {
-      newExtendedTracks.set(songName, settings);
+      newExtendedTracks.set(songId, settings);
     } else {
-      newExtendedTracks.delete(songName);
+      newExtendedTracks.delete(songId);
     }
     setExtendedTracks(newExtendedTracks);
 
     const tracksToSave = Array.from(newExtendedTracks.entries()).map(
-      ([name, { start, duration }]) => ({
-        name,
-        start,
-        duration,
-      })
+      ([id, { start, duration }]) => {
+        const track = tracks.find((t) => t.track.id === id);
+        return {
+          id,
+          name: track?.track.name ?? '',
+          start,
+          duration,
+        };
+      }
     );
 
     tracksService
