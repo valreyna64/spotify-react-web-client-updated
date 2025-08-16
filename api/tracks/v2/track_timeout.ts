@@ -1,25 +1,71 @@
 import type { IncomingMessage, ServerResponse } from 'http';
 
-let tracks = [
-  {
-    id: '2mXqcNCW1IAB88Y7Hz9zsz',
-    name: '三天三夜',
-    start: '0:00',
-    duration: 50,
-  },
-  {
-    id: '2gNjmvuQiEd2z9SqyYi8HH',
-    name: 'Summertime',
-    start: '0:10',
-    duration: 50,
-  },
-];
 
 function handler(req: IncomingMessage, res: ServerResponse) {
   if (req.method === 'GET') {
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(tracks));
+    (async () => {
+      try {
+        const scanResponse = await fetch(
+          `${process.env.KV_REST_API_URL}/scan/0?match=track:*`,
+          {
+            headers: {
+              Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`,
+            },
+          }
+        );
+
+        if (!scanResponse.ok) {
+          const errorText = await scanResponse.text();
+          console.error('Failed to scan for tracks:', errorText);
+          res.statusCode = 500;
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify({ error: 'Failed to scan for tracks' }));
+          return;
+        }
+
+        const {
+          result: [, keys],
+        } = await scanResponse.json();
+
+        if (!keys || keys.length === 0) {
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify([]));
+          return;
+        }
+
+        const mgetResponse = await fetch(`${process.env.KV_REST_API_URL}/mget`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`,
+          },
+          body: JSON.stringify(keys),
+        });
+
+        if (!mgetResponse.ok) {
+          const errorText = await mgetResponse.text();
+          console.error('Failed to fetch tracks:', errorText);
+          res.statusCode = 500;
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify({ error: 'Failed to fetch tracks' }));
+          return;
+        }
+
+        const tracksData = await mgetResponse.json();
+        const tracks = tracksData.result
+          .map((track) => (track ? JSON.parse(track) : null))
+          .filter(Boolean);
+
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(tracks));
+      } catch (error) {
+        console.error('Error fetching tracks from KV:', error);
+        res.statusCode = 500;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ error: 'Failed to fetch tracks' }));
+      }
+    })();
   } else if (req.method === 'POST') {
     let body = '';
     req.on('data', (chunk) => {
@@ -27,8 +73,25 @@ function handler(req: IncomingMessage, res: ServerResponse) {
     });
     req.on('end', async () => {
       try {
-        const newTracks = JSON.parse(body);
-        tracks = newTracks;
+        const newTracks = JSON.parse(body) as any[];
+
+        for (const track of newTracks) {
+          if (track.id) {
+            try {
+              const key = `track:${track.id}`;
+              await fetch(`${process.env.KV_REST_API_URL}`, {
+                headers: {
+                  Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`,
+                },
+                body: JSON.stringify(['SET', key, JSON.stringify(track)]),
+                method: 'POST',
+              });
+            } catch (e) {
+              console.error('Failed to save track', e);
+            }
+          }
+        }
+
         console.log('Tracks updated successfully:', newTracks);
 
         const authHeader =
