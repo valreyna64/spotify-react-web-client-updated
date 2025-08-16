@@ -36,28 +36,27 @@ function handler(req: IncomingMessage, res: ServerResponse) {
           return;
         }
 
-        const mgetResponse = await fetch(`${process.env.KV_REST_API_URL}/mget`, {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`,
-          },
-          body: JSON.stringify(keys),
-        });
+        const tracks = [];
+        for (const key of keys) {
+          const getResponse = await fetch(
+            `${process.env.KV_REST_API_URL}/get/${key}`,
+            {
+              headers: {
+                Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`,
+              },
+            }
+          );
 
-        if (!mgetResponse.ok) {
-          const errorText = await mgetResponse.text();
-          console.error('Failed to fetch tracks:', errorText);
-          res.statusCode = 500;
-          res.setHeader('Content-Type', 'application/json');
-          res.end(JSON.stringify({ error: 'Failed to fetch tracks' }));
-          return;
+          if (getResponse.ok) {
+            const trackData = await getResponse.json();
+            console.log(`Data for key ${key}:`, trackData);
+            if (trackData.result) {
+              tracks.push(JSON.parse(trackData.result));
+            }
+          } else {
+            console.error(`Failed to fetch key ${key}`);
+          }
         }
-
-        const tracksData = await mgetResponse.json();
-        console.log('Data from MGET:', tracksData);
-        const tracks = tracksData.result
-          .map((track) => (track ? JSON.parse(track) : null))
-          .filter(Boolean);
 
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
