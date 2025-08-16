@@ -27,6 +27,8 @@ function handler(req: IncomingMessage, res: ServerResponse) {
           result: [, keys],
         } = await scanResponse.json();
 
+        console.log('Keys from SCAN:', keys);
+
         if (!keys || keys.length === 0) {
           res.statusCode = 200;
           res.setHeader('Content-Type', 'application/json');
@@ -52,6 +54,7 @@ function handler(req: IncomingMessage, res: ServerResponse) {
         }
 
         const tracksData = await mgetResponse.json();
+        console.log('Data from MGET:', tracksData);
         const tracks = tracksData.result
           .map((track) => (track ? JSON.parse(track) : null))
           .filter(Boolean);
