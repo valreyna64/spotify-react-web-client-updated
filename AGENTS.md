@@ -8,7 +8,6 @@ This repository provides a React + TypeScript web client.
 - Follow existing ESLint rules and include semicolons.
 
 ## Commit process
-- Run the test suite before committing: `CI=1 npm test`.
 - Use conventional commit messages (e.g., `feat:`, `fix:`, `docs:`).
 - Ensure the working tree is clean before submitting changes.
 
