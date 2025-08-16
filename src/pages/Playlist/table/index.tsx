@@ -54,6 +54,37 @@ export const PlaylistList: FC<PlaylistListProps> = memo(({ color }) => {
       });
   }, []);
 
+  const handleSaveTrackSettings = (
+    songName: string,
+    settings: { start: string; duration: number } | null
+  ) => {
+    const newExtendedTracks = new Map(extendedTracks);
+    if (settings) {
+      newExtendedTracks.set(songName, settings);
+    } else {
+      newExtendedTracks.delete(songName);
+    }
+    setExtendedTracks(newExtendedTracks);
+
+    const tracksToSave = Array.from(newExtendedTracks.entries()).map(
+      ([name, { start, duration }]) => ({
+        name,
+        start,
+        duration,
+      })
+    );
+
+    tracksService
+      .setTrackTimeout(tracksToSave)
+      .then((response) => {
+        console.log(response.message);
+      })
+      .catch((err) => {
+        console.error('Failed to save track timeout data', err);
+        // TODO: Revert state on error
+      });
+  };
+
   const hasTracks = !!playlist?.tracks?.total;
 
   return (
@@ -110,6 +141,7 @@ export const PlaylistList: FC<PlaylistListProps> = memo(({ color }) => {
                       key={`${song.added_at}-${song.track.id}`}
                       index={index}
                       extendedTracks={extendedTracks}
+                      onSave={handleSaveTrackSettings}
                     />
                   ))}
                 </ReactDragListView>
@@ -122,6 +154,7 @@ export const PlaylistList: FC<PlaylistListProps> = memo(({ color }) => {
                     key={`${song.added_at}-${song.track.id}`}
                     index={index}
                     extendedTracks={extendedTracks}
+                    onSave={handleSaveTrackSettings}
                   />
                 ))}
               </div>
