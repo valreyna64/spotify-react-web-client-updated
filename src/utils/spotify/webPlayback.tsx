@@ -3,6 +3,7 @@ import { useEffect, useRef, FC, memo, useCallback } from 'react';
 import { useAppDispatch } from '../../store/store';
 import { spotifyActions } from '../../store/slices/spotify';
 import { playerService } from '../../services/player';
+import { tracksService } from '../../services/tracks';
 import { timeToMs } from '../../utils';
 
 export interface WebPlaybackProps {
@@ -34,11 +35,10 @@ const WebPlayback: FC<WebPlaybackProps> = memo((props) => {
   const extendedTimeoutTracksRef = useRef<
     Map<string, { start: string; duration: number }>
   >(new Map());
-  const extendedTimeoutTracksUrl = '/api/tracks/v2/track_timeout';
 
   useEffect(() => {
-    fetch(extendedTimeoutTracksUrl)
-      .then((res) => res.json())
+    tracksService
+      .getTrackTimeout()
       .then(
         (
           tracks: { name: string; start: string; duration: number }[],
