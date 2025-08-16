@@ -5,8 +5,8 @@ function handler(req: IncomingMessage, res: ServerResponse) {
   if (req.method === 'GET') {
     (async () => {
       try {
-        const scanResponse = await fetch(
-          `${process.env.KV_REST_API_URL}/scan/0?match=track:*`,
+        const response = await fetch(
+          `${process.env.KV_REST_API_URL}/hvals/tracks:timeout:hash`,
           {
             headers: {
               Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`,
@@ -14,49 +14,19 @@ function handler(req: IncomingMessage, res: ServerResponse) {
           }
         );
 
-        if (!scanResponse.ok) {
-          const errorText = await scanResponse.text();
-          console.error('Failed to scan for tracks:', errorText);
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Failed to fetch tracks from hash:', errorText);
           res.statusCode = 500;
           res.setHeader('Content-Type', 'application/json');
-          res.end(JSON.stringify({ error: 'Failed to scan for tracks' }));
-          return;
-        }
-
-        const {
-          result: [, keys],
-        } = await scanResponse.json();
-
-        console.log('Keys from SCAN:', keys);
-
-        if (!keys || keys.length === 0) {
-          res.statusCode = 200;
-          res.setHeader('Content-Type', 'application/json');
-          res.end(JSON.stringify([]));
-          return;
-        }
-
-        const tracks = [];
-        for (const key of keys) {
-          const getResponse = await fetch(
-            `${process.env.KV_REST_API_URL}/get/${key}`,
-            {
-              headers: {
-                Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`,
-              },
-            }
+          res.end(
+            JSON.stringify({ error: 'Failed to fetch tracks from hash' })
           );
-
-          if (getResponse.ok) {
-            const trackData = await getResponse.json();
-            console.log(`Data for key ${key}:`, trackData);
-            if (trackData.result) {
-              tracks.push(JSON.parse(trackData.result));
-            }
-          } else {
-            console.error(`Failed to fetch key ${key}`);
-          }
+          return;
         }
+
+        const { result } = await response.json();
+        const tracks = result.map((track: string) => JSON.parse(track));
 
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
@@ -77,21 +47,21 @@ function handler(req: IncomingMessage, res: ServerResponse) {
       try {
         const newTracks = JSON.parse(body) as any[];
 
-        for (const track of newTracks) {
-          if (track.id) {
-            try {
-              const key = `track:${track.id}`;
-              await fetch(`${process.env.KV_REST_API_URL}`, {
-                headers: {
-                  Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`,
-                },
-                body: JSON.stringify(['SET', key, JSON.stringify(track)]),
-                method: 'POST',
-              });
-            } catch (e) {
-              console.error('Failed to save track', e);
-            }
-          }
+        const pipeline = newTracks.map((track) => [
+          'HSET',
+          'tracks:timeout:hash',
+          track.id,
+          JSON.stringify(track),
+        ]);
+
+        if (pipeline.length > 0) {
+          await fetch(`${process.env.KV_REST_API_URL}/pipeline`, {
+            headers: {
+              Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`,
+            },
+            body: JSON.stringify(pipeline),
+            method: 'POST',
+          });
         }
 
         console.log('Tracks updated successfully:', newTracks);
@@ -144,21 +114,15 @@ function handler(req: IncomingMessage, res: ServerResponse) {
       try {
         const tracksToDelete = JSON.parse(body) as any[];
 
-        for (const track of tracksToDelete) {
-          if (track.id) {
-            try {
-              const key = `track:${track.id}`;
-              await fetch(`${process.env.KV_REST_API_URL}`, {
-                headers: {
-                  Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`,
-                },
-                body: JSON.stringify(['DEL', key]),
-                method: 'POST',
-              });
-            } catch (e) {
-              console.error('Failed to delete track', e);
-            }
-          }
+        const trackIdsToDelete = tracksToDelete.map((track) => track.id);
+        if (trackIdsToDelete.length > 0) {
+          await fetch(`${process.env.KV_REST_API_URL}`, {
+            headers: {
+              Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`,
+            },
+            body: JSON.stringify(['HDEL', 'tracks:timeout:hash', ...trackIdsToDelete]),
+            method: 'POST',
+          });
         }
 
         console.log('Tracks deleted successfully:', tracksToDelete);
