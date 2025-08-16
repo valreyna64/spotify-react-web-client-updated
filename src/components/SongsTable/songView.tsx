@@ -283,7 +283,7 @@ const Time = ({ song }: ComponentProps) => {
         open={open}
         onOk={() => setOpen(false)}
         onCancel={() => setOpen(false)}
-        title='設定播放時間'
+        title={`設定 ${song.name} 播放時長`}
       >
         <div
           style={{ display: 'flex', alignItems: 'center', gap: 8 }}

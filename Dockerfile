@@ -3,7 +3,7 @@ ARG REACT_APP_SPOTIFY_CLIENT_ID
 ARG REACT_APP_SPOTIFY_REDIRECT_URL=http://localhost:3000/
 
 # build environment
-FROM node:18.12 as builder
+FROM node:18 as builder
 WORKDIR /usr/src/app
 COPY package.json yarn.lock ./
 RUN yarn install --only=production
