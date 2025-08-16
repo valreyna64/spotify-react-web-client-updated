@@ -62,37 +62,48 @@ export const PlaylistList: FC<PlaylistListProps> = memo(({ color }) => {
   const handleSaveTrackSettings = (
     songId: string,
     songName: string,
-    settings: { start: string; duration: number } | null
+    settings: { start: string; duration: number } | null,
   ) => {
     const newExtendedTracks = new Map(extendedTracks);
     if (settings) {
       newExtendedTracks.set(songId, settings);
+      setExtendedTracks(newExtendedTracks);
+
+      const tracksToSave = Array.from(newExtendedTracks.entries()).map(
+        ([id, { start, duration }]) => {
+          const track = tracks.find((t) => t.track.id === id);
+          return {
+            id,
+            name: track?.track.name ?? '',
+            start,
+            duration,
+          };
+        },
+      );
+
+      tracksService
+        .setTrackTimeout(tracksToSave)
+        .then((response) => {
+          console.log(response.message);
+        })
+        .catch((err) => {
+          console.error('Failed to save track timeout data', err);
+          // TODO: Revert state on error
+        });
     } else {
       newExtendedTracks.delete(songId);
+      setExtendedTracks(newExtendedTracks);
+
+      tracksService
+        .deleteTrackTimeout([{ id: songId }])
+        .then((response) => {
+          console.log(response.message);
+        })
+        .catch((err) => {
+          console.error('Failed to delete track timeout data', err);
+          // TODO: Revert state on error
+        });
     }
-    setExtendedTracks(newExtendedTracks);
-
-    const tracksToSave = Array.from(newExtendedTracks.entries()).map(
-      ([id, { start, duration }]) => {
-        const track = tracks.find((t) => t.track.id === id);
-        return {
-          id,
-          name: track?.track.name ?? '',
-          start,
-          duration,
-        };
-      }
-    );
-
-    tracksService
-      .setTrackTimeout(tracksToSave)
-      .then((response) => {
-        console.log(response.message);
-      })
-      .catch((err) => {
-        console.error('Failed to save track timeout data', err);
-        // TODO: Revert state on error
-      });
   };
 
   const hasTracks = !!playlist?.tracks?.total;
