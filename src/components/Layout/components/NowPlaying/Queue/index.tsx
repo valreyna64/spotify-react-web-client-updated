@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { tracksService } from '../../../../../services/tracks';
 import { NowPlayingLayout } from '../layout';
 import { useAppSelector } from '../../../../../store/store';
 import { msToTime, timeToMs } from '../../../../../utils';
@@ -71,8 +72,8 @@ export const Queue = () => {
   >(new Map());
 
   useEffect(() => {
-    fetch('/api/tracks/v2/track_timeout')
-      .then((res) => res.json())
+    tracksService
+      .getTrackTimeout()
       .then(
         (
           tracks: { name: string; start: string; duration: number }[],

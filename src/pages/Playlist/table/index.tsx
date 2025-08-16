@@ -8,6 +8,7 @@ import { PlaylistRecommendations } from '../recommendations';
 
 // Services
 import { playlistService } from '../../../services/playlists';
+import { tracksService } from '../../../services/tracks';
 
 // Redux
 import { playlistActions } from '../../../store/slices/playlist';
@@ -35,8 +36,8 @@ export const PlaylistList: FC<PlaylistListProps> = memo(({ color }) => {
   >(new Map());
 
   useEffect(() => {
-    fetch('/api/tracks/v2/track_timeout')
-      .then((res) => res.json())
+    tracksService
+      .getTrackTimeout()
       .then(
         (
           tracks: { name: string; start: string; duration: number }[],
