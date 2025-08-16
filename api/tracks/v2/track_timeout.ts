@@ -16,19 +16,6 @@ let tracks = [
 ];
 
 function handler(req: IncomingMessage, res: ServerResponse) {
-  const authHeader =
-    req.headers['authorization'] || req.headers['Authorization'];
-
-  if (authHeader) {
-    const maskedAuth =
-      authHeader.length > 10
-        ? `${authHeader.slice(0, 5)}...${authHeader.slice(-5)}`
-        : authHeader;
-    console.log('Authorization header:', maskedAuth);
-  } else {
-    console.log('No Authorization header provided');
-  }
-
   if (req.method === 'GET') {
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');
@@ -38,11 +25,42 @@ function handler(req: IncomingMessage, res: ServerResponse) {
     req.on('data', (chunk) => {
       body += chunk.toString();
     });
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         const newTracks = JSON.parse(body);
         tracks = newTracks;
         console.log('Tracks updated successfully:', newTracks);
+
+        const authHeader =
+          req.headers['authorization'] || req.headers['Authorization'];
+
+        if (authHeader) {
+          try {
+            const response = await fetch('https://api.spotify.com/v1/me', {
+              headers: {
+                Authorization: authHeader as string,
+              },
+            });
+
+            if (response.ok) {
+              const spotifyUserData = await response.json();
+              console.log('Spotify user data:', spotifyUserData);
+            } else {
+              console.error(
+                'Failed to fetch Spotify user data:',
+                response.status,
+                response.statusText
+              );
+              const errorBody = await response.text();
+              console.error('Spotify API error response:', errorBody);
+            }
+          } catch (error) {
+            console.error('Error fetching Spotify user data:', error);
+          }
+        } else {
+          console.log('No Authorization header provided');
+        }
+
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({ message: 'Tracks updated successfully' }));
