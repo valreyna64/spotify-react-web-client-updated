@@ -10,4 +10,19 @@ export const tracksService = {
     });
     return response.json();
   },
+
+  setTrackTimeout: async (
+    tracks: { name: string; start: string; duration: number }[]
+  ) => {
+    const access_token = getFromLocalStorageWithExpiry('access_token') as string;
+    const response = await fetch('/api/tracks/v2/track_timeout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${access_token}`,
+      },
+      body: JSON.stringify(tracks),
+    });
+    return response.json();
+  },
 };

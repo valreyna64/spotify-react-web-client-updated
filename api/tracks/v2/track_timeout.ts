@@ -1,36 +1,60 @@
 import type { IncomingMessage, ServerResponse } from 'http';
 
+let tracks = [
+  {
+    name: '三天三夜',
+    start: '0:00',
+    duration: 50,
+  },
+  {
+    name: 'Summertime',
+    start: '0:10',
+    duration: 50,
+  },
+];
+
 function handler(req: IncomingMessage, res: ServerResponse) {
-  const tracks = [
-    {
-      name: '三天三夜',
-      start: '0:00',
-      duration: 50
-    },
-    {
-      name: 'Summertime',
-      start: '0:10',
-      duration: 50
-    }
-  ];
-  res.statusCode = 200;
+  const authHeader =
+    req.headers['authorization'] || req.headers['Authorization'];
 
-  // 從 headers 取得 Authorization
-  const authHeader = req.headers['authorization'] || req.headers['Authorization'];
-
-  // 安全起見只顯示前後幾個字元
   if (authHeader) {
-    const maskedAuth = authHeader.length > 10
-      ? `${authHeader.slice(0, 5)}...${authHeader.slice(-5)}`
-      : authHeader;
+    const maskedAuth =
+      authHeader.length > 10
+        ? `${authHeader.slice(0, 5)}...${authHeader.slice(-5)}`
+        : authHeader;
     console.log('Authorization header:', maskedAuth);
   } else {
     console.log('No Authorization header provided');
   }
 
-
-  res.setHeader('Content-Type', 'application/json');
-  res.end(JSON.stringify(tracks));
+  if (req.method === 'GET') {
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'application/json');
+    res.end(JSON.stringify(tracks));
+  } else if (req.method === 'POST') {
+    let body = '';
+    req.on('data', (chunk) => {
+      body += chunk.toString();
+    });
+    req.on('end', () => {
+      try {
+        const newTracks = JSON.parse(body);
+        tracks = newTracks;
+        console.log('Tracks updated successfully:', newTracks);
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ message: 'Tracks updated successfully' }));
+      } catch (error) {
+        res.statusCode = 400;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ error: 'Invalid JSON' }));
+      }
+    });
+  } else {
+    res.statusCode = 405;
+    res.setHeader('Allow', 'GET, POST');
+    res.end('Method Not Allowed');
+  }
 }
 
 module.exports = handler;

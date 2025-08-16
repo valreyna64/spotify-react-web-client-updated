@@ -11,10 +11,14 @@ interface SongProps {
   index: number;
   song: PlaylistItemWithSaved;
   extendedTracks: Map<string, { start: string; duration: number }>;
+  onSave: (
+    songName: string,
+    settings: { start: string; duration: number } | null
+  ) => void;
 }
 
 export const Song = (props: SongProps) => {
-  const { song, index, extendedTracks } = props;
+  const { song, index, extendedTracks, onSave } = props;
 
   const dispatch = useAppDispatch();
   const view = useAppSelector((state) => state.playlist.view);
@@ -54,6 +58,7 @@ export const Song = (props: SongProps) => {
           <TrackTimeSettings
             song={props.song}
             extendedTracks={extendedTracks}
+            onSave={onSave}
           />
         ),
         SongViewComponents.Actions,

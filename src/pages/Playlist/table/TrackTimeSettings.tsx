@@ -18,10 +18,14 @@ dayjs.extend(customParseFormat);
 interface TrackTimeSettingsProps {
   song: Track;
   extendedTracks: Map<string, { start: string; duration: number }>;
+  onSave: (
+    songName: string,
+    settings: { start: string; duration: number } | null
+  ) => void;
 }
 
 export const TrackTimeSettings = (props: TrackTimeSettingsProps) => {
-  const { song, extendedTracks } = props;
+  const { song, extendedTracks, onSave } = props;
 
   const [open, setOpen] = useState(false);
   const [isCustomTimeEnabled, setIsCustomTimeEnabled] = useState(false);
@@ -73,6 +77,20 @@ export const TrackTimeSettings = (props: TrackTimeSettingsProps) => {
       )}`
     : msToTime(song.duration_ms);
 
+  const handleOk = () => {
+    if (isCustomTimeEnabled) {
+      if (startTime && seconds !== null) {
+        onSave(song.name, {
+          start: startTime.format('mm:ss'),
+          duration: seconds,
+        });
+      }
+    } else {
+      onSave(song.name, null);
+    }
+    setOpen(false);
+  };
+
   return (
     <>
       <p
@@ -98,7 +116,7 @@ export const TrackTimeSettings = (props: TrackTimeSettingsProps) => {
           destroyOnClose
           className="track-time-settings-modal"
           open={open}
-          onOk={() => setOpen(false)}
+          onOk={handleOk}
           onCancel={() => setOpen(false)}
           title='設定播放時間'
         >
