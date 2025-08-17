@@ -24,10 +24,10 @@ const Home: FC<HomeProps> = memo((props) => {
       dispatch(homeActions.fetchMadeForYou());
       dispatch(homeActions.fetchRecentlyPlayed());
     }
-    dispatch(homeActions.fetchRanking());
-    dispatch(homeActions.fetchTrending());
-    dispatch(homeActions.fetchNewReleases());
-    dispatch(homeActions.fecthFeaturedPlaylists());
+    // dispatch(homeActions.fetchRanking());
+    // dispatch(homeActions.fetchTrending());
+    // dispatch(homeActions.fetchNewReleases());
+    // dispatch(homeActions.fecthFeaturedPlaylists());
   }, [user, dispatch]);
 
   return <HomePageContainer container={container} />;
