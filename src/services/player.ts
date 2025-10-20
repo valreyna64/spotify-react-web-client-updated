@@ -96,7 +96,7 @@ const addToQueue = async (uri: string) => {
 };
 
 /**
- * @description Get tracks from the current user's recently played tracks. Note: Currently doesn't support podcast episodes.
+ * @description Get tracks from the current user's Recently Playedd tracks. Note: Currently doesn't support podcast episodes.
  */
 const getRecentlyPlayed = async (params: { limit?: number; after?: number; before?: number }) => {
   const response = await axios.get<Pagination<PlayHistoryObject>>('/me/player/recently-played', {

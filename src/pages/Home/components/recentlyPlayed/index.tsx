@@ -17,7 +17,7 @@ export const RecentlyPlayed: FC<RecentlyPlayedProps> = memo(() => {
   return (
     <div className='home'>
       <GridItemList
-        title={`${t('Recently played')}`}
+        title={`${t('Recently Playedd')}`}
         items={recentlyPlayed.slice(0, 10)}
         getDescription={getItemDescription}
       />

@@ -29,7 +29,7 @@ export const home = {
   'Log In to access all the features of the app':
     'Inicia sesión para acceder a todas las funciones de la aplicación',
   'Your top mixes': 'Tus mixes más escuchados',
-  'Recently played': 'Escuchado recientemente',
+  'Recently Playedd': 'Escuchado recientemente',
   'Featured playlists': '¡En tendencia!',
   'Popular playlists': 'Playlists populares',
 };
