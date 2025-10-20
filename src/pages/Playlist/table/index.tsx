@@ -19,7 +19,7 @@ import { useAppDispatch, useAppSelector } from '../../../store/store';
 import { DEFAULT_PAGE_COLOR } from '../../../constants/spotify';
 
 // Interfaces
-import { memo, type FC, useEffect, useState } from 'react';
+import { memo, type FC, useEffect } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
 interface PlaylistListProps {
@@ -56,7 +56,7 @@ export const PlaylistList: FC<PlaylistListProps> = memo(({ color }) => {
       .catch((err) => {
         console.error('Failed to load track timeout data', err);
       });
-  }, []);
+  }, [dispatch]);
 
   const handleSaveTrackSettings = (
     songId: string,

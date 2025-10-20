@@ -75,7 +75,7 @@ export const TrackTimeSettings = (props: TrackTimeSettingsProps) => {
   const trackDurationMs = song.duration_ms;
   const maxMinutes = Math.floor(trackDurationMs / 60000);
   const maxSeconds = Math.floor((trackDurationMs % 60000) / 1000);
-  const totalSeconds = trackDurationMs / 1000;
+  // const totalSeconds = trackDurationMs / 1000;
 
   const minuteOptions = Array.from({ length: maxMinutes + 1 }, (_, i) => ({
     value: i,
